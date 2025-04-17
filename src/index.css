@@ -1,0 +1,731 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import './styles/theme-transition.css';
+
+/* Global text contrast fixes for all themes */
+
+/* Ensure all text has proper contrast against its background */
+.light {
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-tertiary: #6B7280;
+  --text-inverse: #F9FAFB;
+  --text-accent: #2563EB;
+}
+
+.dark {
+  --text-primary: #F9FAFB;
+  --text-secondary: #E5E7EB;
+  --text-tertiary: #D1D5DB;
+  --text-inverse: #1F2937;
+  --text-accent: #3B82F6;
+}
+
+.sunset {
+  --text-primary: #7C2D12;
+  --text-secondary: #9A3412;
+  --text-tertiary: #B45309;
+  --text-inverse: #FEF3C7;
+  --text-accent: #EA580C;
+}
+
+.forest {
+  --text-primary: #166534;
+  --text-secondary: #15803D;
+  --text-tertiary: #16A34A;
+  --text-inverse: #F0FDF4;
+  --text-accent: #22C55E;
+}
+
+.ocean {
+  --text-primary: #0E7490;
+  --text-secondary: #0891B2;
+  --text-tertiary: #06B6D4;
+  --text-inverse: #ECFEFF;
+  --text-accent: #0EA5E9;
+}
+
+.midnight {
+  --text-primary: #E0E7FF;
+  --text-secondary: #C7D2FE;
+  --text-tertiary: #A5B4FC;
+  --text-inverse: #1E1B4B;
+  --text-accent: #818CF8;
+}
+
+.punk {
+  --text-primary: #FEF2F2;
+  --text-secondary: #FEE2E2;
+  --text-tertiary: #FECACA;
+  --text-inverse: #7F1D1D;
+  --text-accent: #F87171;
+}
+
+.classic {
+  --text-primary: #1F2937;
+  --text-secondary: #374151;
+  --text-tertiary: #4B5563;
+  --text-inverse: #F9FAFB;
+  --text-accent: #2563EB;
+}
+
+/* Apply contrast fixes to all major UI components */
+
+/* Task items */
+.task-item {
+  color: var(--text-primary) !important;
+}
+
+.task-item .task-category {
+  color: var(--text-inverse) !important;
+}
+
+/* Stats page text */
+.dark h2, .midnight h2, .punk h2 {
+  color: var(--text-primary) !important;
+}
+
+.dark h3, .midnight h3, .punk h3,
+.dark p, .midnight p, .punk p {
+  color: var(--text-secondary) !important;
+}
+
+/* Cards and containers */
+.dark .bg-white, .midnight .bg-white, .punk .bg-white {
+  background-color: rgba(30, 30, 30, 0.7) !important;
+}
+
+.dark .bg-gray-50, .midnight .bg-gray-50, .punk .bg-gray-50,
+.dark .bg-gray-100, .midnight .bg-gray-100, .punk .bg-gray-100 {
+  background-color: rgba(25, 25, 25, 0.7) !important;
+}
+
+/* Focus mode text */
+.focus-mode-container h2 {
+  color: var(--text-accent) !important;
+}
+
+.focus-mode-container h3,
+.focus-mode-container .text-lg {
+  color: var(--text-primary) !important;
+}
+
+.focus-mode-container p,
+.focus-mode-container .text-gray-500,
+.focus-mode-container .text-gray-600,
+.focus-mode-container .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+.dark .focus-mode-container .quote,
+.midnight .focus-mode-container .quote,
+.punk .focus-mode-container .quote {
+  color: var(--text-primary) !important;
+}
+
+.dark .focus-mode-container .author,
+.midnight .focus-mode-container .author,
+.punk .focus-mode-container .author {
+  color: var(--text-secondary) !important;
+}
+
+/* Tab navigation */
+.tab-button {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tab-button::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-accent);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.tab-button.active {
+  color: var(--text-inverse) !important;
+}
+
+.tab-button.active::after {
+  transform: scaleX(1);
+}
+
+.tab-button:not(.active) {
+  color: var(--text-primary) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .tab-button:not(.active),
+.midnight .tab-button:not(.active),
+.punk .tab-button:not(.active) {
+  color: var(--text-secondary) !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Fix text in charts and data visualizations */
+.recharts-text,
+.recharts-legend-item-text {
+  fill: var(--text-primary) !important;
+}
+
+.dark .recharts-text,
+.dark .recharts-legend-item-text,
+.midnight .recharts-text,
+.midnight .recharts-legend-item-text,
+.punk .recharts-text,
+.punk .recharts-legend-item-text {
+  fill: var(--text-secondary) !important;
+}
+
+/* Improve contrast for focus mode ambience controls */
+.ambient-controls button {
+  color: var(--text-primary) !important;
+}
+
+.dark .ambient-controls button,
+.midnight .ambient-controls button,
+.punk .ambient-controls button {
+  color: var(--text-secondary) !important;
+}
+
+.ambient-controls button.active {
+  color: var(--text-accent) !important;
+  background-color: rgba(var(--primary-rgb), 0.2) !important;
+}
+
+/* Fix text contrast in Pomodoro timer */
+.pomodoro-timer {
+  color: var(--text-primary) !important;
+}
+
+.dark .pomodoro-timer,
+.midnight .pomodoro-timer,
+.punk .pomodoro-timer {
+  color: var(--text-primary) !important;
+}
+
+.pomodoro-timer .timer-display {
+  color: var(--text-accent) !important;
+}
+
+/* Base theme variables */
+:root {
+  --transition-fast: 0.15s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+}
+
+/* Neo Tokyo theme - Futuristic, high-contrast, techy */
+.neo-tokyo {
+  /* Typography */
+  --font-primary: 'Saira Stencil One', sans-serif;
+  --letter-spacing: 1px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Core colors */
+  --color-primary: #00f0ff;
+  --color-primary-rgb: 0, 240, 255;
+  --color-secondary: #ff00aa;
+  --color-secondary-rgb: 255, 0, 170;
+  --color-tertiary: #bf00ff;
+  --color-tertiary-rgb: 191, 0, 255;
+  --color-accent: #ffcc00;
+  --color-accent-rgb: 255, 204, 0;
+  
+  /* Background colors */
+  --color-bg-primary: #090916;
+  --color-bg-secondary: #0f0f24;
+  --color-bg-tertiary: #161632;
+  
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-tertiary: rgba(255, 255, 255, 0.6);
+  --color-text-inverse: #000000;
+
+  /* UI elements */
+  --color-border: rgba(0, 240, 255, 0.3);
+  --color-card-bg: rgba(15, 15, 36, 0.8);
+  --color-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+  --color-glow: 0 0 8px rgba(0, 240, 255, 0.8);
+  
+  /* Task status colors */
+  --color-success: #00ff8a;
+  --color-warning: #ffcc00;
+  --color-error: #ff0055;
+  --color-info: #00a3ff;
+  
+  /* Priority colors */
+  --color-priority-high: #ff0055;
+  --color-priority-medium: #ffcc00;
+  --color-priority-low: #00f0ff;
+  
+  /* Animation properties */
+  --animation-curve: cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  --animation-time: 0.2s;
+  
+  /* Border radius */
+  --border-radius-sm: 2px;
+  --border-radius-md: 4px;
+  --border-radius-lg: 8px;
+
+  /* Neo Tokyo specific background */
+  background-image: linear-gradient(to bottom, #090916, #0c0c1d);
+  
+  /* Apply theme font to all elements */
+  font-family: var(--font-primary);
+  letter-spacing: var(--letter-spacing);
+}
+
+/* Pastel Vibes theme - Soft, cute, cozy aesthetic */
+.pastel-vibes {
+  /* Typography */
+  --font-primary: 'Comic Neue', cursive;
+  --letter-spacing: 0.3px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Core colors */
+  --color-primary: #b5a9ff;
+  --color-primary-rgb: 181, 169, 255;
+  --color-secondary: #ffafcc;
+  --color-secondary-rgb: 255, 175, 204;
+  --color-tertiary: #a2e4b8;
+  --color-tertiary-rgb: 162, 228, 184;
+  --color-accent: #fec89a;
+  --color-accent-rgb: 254, 200, 154;
+  
+  /* Background colors */
+  --color-bg-primary: #fffcf7;
+  --color-bg-secondary: #f8edeb;
+  --color-bg-tertiary: #f9f5f1;
+  
+  /* Text colors */
+  --color-text-primary: #6d6875;
+  --color-text-secondary: #8d8393;
+  --color-text-tertiary: #ada3b0;
+  --color-text-inverse: #ffffff;
+
+  /* UI elements */
+  --color-border: rgba(181, 169, 255, 0.3);
+  --color-card-bg: #ffffff;
+  --color-shadow: 0 4px 15px rgba(181, 169, 255, 0.15);
+  --color-glow: 0 0 10px rgba(255, 175, 204, 0.3);
+  
+  /* Task status colors */
+  --color-success: #a2e4b8;
+  --color-warning: #fec89a;
+  --color-error: #ffafcc;
+  --color-info: #b5a9ff;
+  
+  /* Priority colors */
+  --color-priority-high: #f28482;
+  --color-priority-medium: #fec89a;
+  --color-priority-low: #a2e4b8;
+  
+  /* Animation properties */
+  --animation-curve: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animation-time: 0.4s;
+  
+  /* Border radius */
+  --border-radius-sm: 10px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+
+  /* Pastel Vibes specific background */
+  background-image: linear-gradient(120deg, #fffcf7, #f8edeb);
+  
+  /* Apply theme font to all elements */
+  font-family: var(--font-primary);
+  letter-spacing: var(--letter-spacing);
+}
+
+/* Dark Academia theme - Vintage, intellectual, moody */
+.dark-academia {
+  /* Typography */
+  --font-primary: 'Cormorant Garamond', serif;
+  --letter-spacing: 0.5px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+
+  /* Core colors */
+  --color-primary: #9c6644;
+  --color-primary-rgb: 156, 102, 68;
+  --color-secondary: #7d5a50;
+  --color-secondary-rgb: 125, 90, 80;
+  --color-tertiary: #4a3933;
+  --color-tertiary-rgb: 74, 57, 51;
+  --color-accent: #b08968;
+  --color-accent-rgb: 176, 137, 104;
+  
+  /* Background colors */
+  --color-bg-primary: #f5ebe0;
+  --color-bg-secondary: #e3d5ca;
+  --color-bg-tertiary: #d5bdaf;
+  
+  /* Text colors */
+  --color-text-primary: #3d2b24;
+  --color-text-secondary: #57453c;
+  --color-text-tertiary: #78635a;
+  --color-text-inverse: #f5ebe0;
+
+  /* UI elements */
+  --color-border: rgba(156, 102, 68, 0.3);
+  --color-card-bg: #f9f4ef;
+  --color-shadow: 0 4px 12px rgba(156, 102, 68, 0.15);
+  --color-glow: 0 0 8px rgba(156, 102, 68, 0.2);
+  
+  /* Task status colors */
+  --color-success: #778466;
+  --color-warning: #c19a6b;
+  --color-error: #a9604c;
+  --color-info: #756c5b;
+  
+  /* Priority colors */
+  --color-priority-high: #a9604c;
+  --color-priority-medium: #c19a6b;
+  --color-priority-low: #778466;
+  
+  /* Animation properties */
+  --animation-curve: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --animation-time: 0.3s;
+  
+  /* Border radius */
+  --border-radius-sm: 0px;
+  --border-radius-md: 2px;
+  --border-radius-lg: 4px;
+
+  /* Dark Academia specific background */
+  background-image: url('./textures/paper-texture.jpg');
+  background-color: #f5ebe0;
+  background-blend-mode: overlay;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  
+  /* Apply theme font to all elements */
+  font-family: var(--font-primary);
+  letter-spacing: var(--letter-spacing);
+}
+
+/* Theme-specific element typography */
+.neo-tokyo h1, 
+.neo-tokyo h2, 
+.neo-tokyo h3, 
+.neo-tokyo h4, 
+.neo-tokyo h5, 
+.neo-tokyo h6 {
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.neo-tokyo .task-title {
+  letter-spacing: 1.5px;
+}
+
+.pastel-vibes h1, 
+.pastel-vibes h2, 
+.pastel-vibes h3, 
+.pastel-vibes h4, 
+.pastel-vibes h5, 
+.pastel-vibes h6 {
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.5px;
+}
+
+.pastel-vibes .task-title {
+  font-weight: var(--font-weight-medium);
+}
+
+.dark-academia h1, 
+.dark-academia h2, 
+.dark-academia h3, 
+.dark-academia h4, 
+.dark-academia h5, 
+.dark-academia h6 {
+  font-weight: var(--font-weight-medium);
+  font-style: italic;
+  letter-spacing: 0.7px;
+}
+
+.dark-academia .task-title {
+  font-weight: var(--font-weight-normal);
+  font-size: 1.05em;
+}
+
+/* Task card styling for each theme */
+.neo-tokyo .task-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--color-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.neo-tokyo .task-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--color-glow);
+}
+
+.pastel-vibes .task-card {
+  background-color: var(--color-card-bg);
+  border: none;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--color-shadow);
+  transition: transform 0.3s var(--animation-curve), box-shadow 0.3s var(--animation-curve);
+}
+
+.pastel-vibes .task-card:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--color-glow);
+}
+
+.dark-academia .task-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--color-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background-image: url('./textures/paper-texture-light.jpg');
+  background-size: cover;
+  background-blend-mode: overlay;
+}
+
+.dark-academia .task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--color-glow);
+}
+
+/* Theme-specific buttons */
+.neo-tokyo .button {
+  background-color: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.neo-tokyo .button:hover {
+  background-color: var(--color-primary);
+  color: var(--color-bg-primary);
+  box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.5);
+}
+
+.neo-tokyo .button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 300%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(var(--color-primary-rgb), 0) 0%,
+    rgba(var(--color-primary-rgb), 0.2) 50%,
+    rgba(var(--color-primary-rgb), 0) 100%
+  );
+  transform: rotate(30deg);
+  transition: transform 0.5s ease;
+}
+
+.neo-tokyo .button:hover::after {
+  transform: translateX(100%) rotate(30deg);
+}
+
+.pastel-vibes .button {
+  background-color: var(--color-primary);
+  border: none;
+  color: white;
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(var(--color-primary-rgb), 0.25);
+  transition: all 0.3s var(--animation-curve);
+}
+
+.pastel-vibes .button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.dark-academia .button {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.dark-academia .button:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Priority badge styles for each theme */
+.neo-tokyo .priority-badge.high {
+  background-color: rgba(var(--color-priority-high), 0.2);
+  color: var(--color-priority-high);
+  border: 1px solid var(--color-priority-high);
+}
+
+.neo-tokyo .priority-badge.medium {
+  background-color: rgba(var(--color-priority-medium), 0.2);
+  color: var(--color-priority-medium);
+  border: 1px solid var(--color-priority-medium);
+}
+
+.neo-tokyo .priority-badge.low {
+  background-color: rgba(var(--color-priority-low), 0.2);
+  color: var(--color-priority-low);
+  border: 1px solid var(--color-priority-low);
+}
+
+.pastel-vibes .priority-badge {
+  border-radius: 100px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 600;
+}
+
+.pastel-vibes .priority-badge.high {
+  background-color: var(--color-priority-high);
+  color: white;
+}
+
+.pastel-vibes .priority-badge.medium {
+  background-color: var(--color-priority-medium);
+  color: var(--color-text-primary);
+}
+
+.pastel-vibes .priority-badge.low {
+  background-color: var(--color-priority-low);
+  color: var(--color-text-primary);
+}
+
+.dark-academia .priority-badge {
+  font-style: italic;
+}
+
+.dark-academia .priority-badge.high {
+  color: var(--color-priority-high);
+  border-bottom: 1px solid var(--color-priority-high);
+}
+
+.dark-academia .priority-badge.medium {
+  color: var(--color-priority-medium);
+  border-bottom: 1px solid var(--color-priority-medium);
+}
+
+.dark-academia .priority-badge.low {
+  color: var(--color-priority-low);
+  border-bottom: 1px solid var(--color-priority-low);
+}
+
+/* Dark Academia widget and modal styles */
+.dark-academia .widget,
+.dark-academia .modal-content {
+  background-image: url('./textures/paper-texture-light.jpg');
+  background-size: cover;
+  background-blend-mode: overlay;
+  border: 1px solid rgba(156, 102, 68, 0.3);
+}
+
+/* Neo Tokyo widget and modal styles */
+.neo-tokyo .widget,
+.neo-tokyo .modal-content {
+  background-image: url('./textures/paper-texture.jpg');
+  background-size: cover;
+  background-blend-mode: color-burn;
+  border: 1px solid rgba(255, 99, 132, 0.3);
+}
+
+/* Pastel Vibes widget and modal styles */
+.pastel-vibes .widget,
+.pastel-vibes .modal-content {
+  background-image: url('./textures/paper-texture-light.jpg');
+  background-size: cover;
+  background-blend-mode: soft-light;
+  border: 1px solid rgba(142, 209, 252, 0.3);
+}
+
+/* Theme transition animation */
+.theme-transition {
+  transition: background-color 0.5s ease,
+              color 0.5s ease,
+              font-family 0.5s ease;
+}
+
+/* Theme Transition Effects */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-transition * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, 
+              font-family 0.3s ease, letter-spacing 0.3s ease;
+}
+
+/* For elements that should have a specialized transition */
+.theme-transition .task-item {
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.theme-transition .theme-fade-element {
+  animation: themeFade 0.4s ease-in-out;
+}
+
+@keyframes themeFade {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Common heading styles */
+h1, h2, h3, h4, h5, h6 {
+  transition: font-family 0.3s ease, letter-spacing 0.3s ease, font-weight 0.3s ease;
+}
+
+/* Theme-specific styles for buttons */
+.neo-tokyo button {
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pastel-vibes button {
+  transition: all 0.2s ease;
+  border-radius: 12px;
+}
+
+.dark-academia button {
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Apply these base styles to maintain compatibility */
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 

@@ -1,0 +1,245 @@
+/* Focus Mode Container */
+.focus-mode-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.focus-mode-container {
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  background-color: var(--color-bg-secondary);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  position: relative;
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+.focus-mode-header {
+  padding: 1.5rem;
+  position: relative;
+  text-align: center;
+}
+
+.focus-mode-content {
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.95);
+  }
+}
+
+/* Animation classes */
+.focus-mode-enter .focus-mode-container {
+  animation: fadeIn 0.3s ease forwards, scaleIn 0.3s ease forwards;
+}
+
+.focus-mode-exit .focus-mode-container {
+  animation: fadeOut 0.3s ease forwards, scaleOut 0.3s ease forwards;
+}
+
+/* Task Selection */
+.task-selection {
+  margin-bottom: 2rem;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark .task-item {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.task-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .task-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.task-item.selected {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.task-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 0.5rem;
+}
+
+.task-category {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  color: white;
+  font-weight: 500;
+}
+
+/* Pomodoro Timer */
+.pomodoro-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.pomodoro-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer-display-container {
+  margin-bottom: 1.5rem;
+}
+
+/* Break Time Content */
+.break-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quote-container {
+  text-align: center;
+  max-width: 500px;
+}
+
+.quote {
+  font-size: 1.25rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.author {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.break-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  overflow: hidden;
+}
+
+.break-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.break-tip {
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* Ambient Sounds */
+.ambient-sounds-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .ambient-sounds-container {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.ambient-sounds {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Scrollbar styles */
+.task-list::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.task-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0.25rem;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+}
+
+.dark .task-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .task-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+} 

@@ -2,28 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Theme colors */
+:root {
+  --color-primary: #3B82F6;
+  --color-secondary: #93C5FD;
+  --color-background: #F9FAFB;
+  --color-background-secondary: #FFFFFF;
+  --color-text: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-accent: #60A5FA;
+}
+
+.dark {
+  --color-primary: #3B82F6;
+  --color-secondary: #1E40AF;
+  --color-background: #111827;
+  --color-background-secondary: #1F2937;
+  --color-text: #F9FAFB;
+  --color-text-secondary: #D1D5DB;
+  --color-accent: #60A5FA;
+}
+
+.sunset {
+  --color-primary: #F97316;
+  --color-secondary: #7C2D12;
+  --color-background: #FFFBEB;
+  --color-background-secondary: #FEF3C7;
+  --color-text: #7C2D12;
+  --color-text-secondary: #92400E;
+  --color-accent: #FB923C;
+}
+
+.ocean {
+  --color-primary: #0891B2;
+  --color-secondary: #0E7490;
+  --color-background: #ECFEFF;
+  --color-background-secondary: #CFFAFE;
+  --color-text: #164E63;
+  --color-text-secondary: #0E7490;
+  --color-accent: #06B6D4;
+}
+
+.forest {
+  --color-primary: #3B5249;
+  --color-secondary: #8FA998;
+  --color-background: #F0FDF4;
+  --color-background-secondary: #DCFCE7;
+  --color-text: #166534;
+  --color-text-secondary: #3B5249;
+  --color-accent: #4ADE80;
+}
+
 body {
-  @apply bg-gray-50 dark:bg-gray-900 min-h-screen;
+  @apply transition-colors duration-300;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+/* Tab animations */
+.tab-enter {
+  animation: slideIn 0.3s forwards;
 }
 
 .task-card {
   @apply bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-3 flex items-center;
+  animation: fadeIn 0.3s ease-out;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  background-color: var(--color-background-secondary);
 }
 
 .task-card:hover {
-  @apply shadow-lg transition-shadow duration-200;
+  @apply shadow-lg;
+  transform: translateY(-2px);
+}
+
+.task-card.dragging {
+  @apply bg-gray-50 dark:bg-gray-700 shadow-lg;
+  transform: scale(1.02);
+}
+
+.task-card.removing {
+  animation: fadeOut 0.3s ease-in forwards;
 }
 
 .task-input {
   @apply w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text);
 }
 
 .btn {
-  @apply px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors duration-200;
+  @apply px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200;
+  transform: translateY(0);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  @apply shadow-md;
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
-  @apply bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-300;
+  background-color: var(--color-primary);
+  @apply text-white focus:ring-blue-300;
 }
 
 .btn-danger {
@@ -31,7 +131,7 @@ body {
 }
 
 .category-work {
-  @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
 }
 
 .category-study {
@@ -40,4 +140,33 @@ body {
 
 .category-personal {
   @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+/* Empty state styling */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-12 opacity-80;
+  transition: opacity 0.3s ease;
+}
+
+.empty-state:hover {
+  @apply opacity-100;
+}
+
+.empty-state svg {
+  @apply mb-4 text-gray-400 dark:text-gray-600;
+  transition: transform 0.3s ease;
+}
+
+.empty-state:hover svg {
+  transform: scale(1.05);
+}
+
+/* Error message styling */
+.error-message {
+  @apply text-red-500 text-sm mt-1 flex items-center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.error-message svg {
+  @apply mr-1 h-4 w-4;
 } 

@@ -1,0 +1,172 @@
+/* Theme Transition Effects */
+.theme-transition {
+  transition: background-color 0.5s ease, 
+              color 0.5s ease, 
+              border-color 0.5s ease, 
+              box-shadow 0.5s ease, 
+              background-image 0.5s ease;
+}
+
+.theme-transition * {
+  transition: background-color 0.5s ease, 
+              color 0.5s ease, 
+              border-color 0.5s ease, 
+              box-shadow 0.5s ease, 
+              font-family 0.5s ease, 
+              letter-spacing 0.5s ease,
+              text-shadow 0.5s ease;
+}
+
+/* Special transitions for specific elements */
+.theme-transition .task-item,
+.theme-transition .task-card {
+  transition: transform 0.3s ease, 
+              box-shadow 0.5s ease, 
+              background-color 0.5s ease,
+              border-color 0.5s ease;
+}
+
+.theme-transition button,
+.theme-transition .button {
+  transition: background-color 0.5s ease,
+              color 0.5s ease,
+              border-color 0.5s ease,
+              box-shadow 0.5s ease,
+              transform 0.3s ease;
+}
+
+.theme-transition input,
+.theme-transition textarea,
+.theme-transition select {
+  transition: background-color 0.5s ease,
+              color 0.5s ease,
+              border-color 0.5s ease,
+              box-shadow 0.5s ease;
+}
+
+/* Fade effect for theme changes */
+.theme-fade-element {
+  animation: themeFade 0.5s ease-in-out;
+}
+
+@keyframes themeFade {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure smooth font transitions */
+h1, h2, h3, h4, h5, h6, p, span, div {
+  transition: font-family 0.5s ease, 
+              letter-spacing 0.5s ease, 
+              font-weight 0.5s ease,
+              color 0.5s ease;
+}
+
+/* Theme-specific font styling - Extremely aggressive approach */
+/* Neo Tokyo theme font styling */
+html.neo-tokyo,
+body.neo-tokyo,
+.neo-tokyo,
+.neo-tokyo body,
+.neo-tokyo #root,
+.neo-tokyo [class*="container"],
+.neo-tokyo [class*="wrapper"],
+.neo-tokyo div,
+.neo-tokyo p,
+.neo-tokyo span,
+.neo-tokyo a,
+.neo-tokyo button,
+.neo-tokyo input,
+.neo-tokyo select,
+.neo-tokyo textarea {
+  font-family: 'Saira Stencil One', sans-serif !important;
+  letter-spacing: 1px;
+}
+
+.neo-tokyo h1, 
+.neo-tokyo h2, 
+.neo-tokyo h3, 
+.neo-tokyo h4 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.neo-tokyo .task-title,
+.neo-tokyo button,
+.neo-tokyo .button {
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Pastel Vibes theme font styling */
+html.pastel-vibes,
+body.pastel-vibes,
+.pastel-vibes,
+.pastel-vibes body,
+.pastel-vibes #root,
+.pastel-vibes [class*="container"],
+.pastel-vibes [class*="wrapper"],
+.pastel-vibes div,
+.pastel-vibes p,
+.pastel-vibes span,
+.pastel-vibes a,
+.pastel-vibes button,
+.pastel-vibes input,
+.pastel-vibes select,
+.pastel-vibes textarea {
+  font-family: 'Comic Neue', cursive !important;
+  letter-spacing: 0.3px;
+}
+
+.pastel-vibes h1, 
+.pastel-vibes h2, 
+.pastel-vibes h3, 
+.pastel-vibes h4 {
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.pastel-vibes .task-title {
+  font-weight: 500;
+}
+
+/* Dark Academia theme font styling */
+html.dark-academia,
+body.dark-academia,
+.dark-academia,
+.dark-academia body,
+.dark-academia #root,
+.dark-academia [class*="container"],
+.dark-academia [class*="wrapper"],
+.dark-academia div,
+.dark-academia p,
+.dark-academia span,
+.dark-academia a,
+.dark-academia button,
+.dark-academia input,
+.dark-academia select,
+.dark-academia textarea {
+  font-family: 'Cormorant Garamond', serif !important;
+  letter-spacing: 0.5px;
+}
+
+.dark-academia h1, 
+.dark-academia h2, 
+.dark-academia h3, 
+.dark-academia h4 {
+  font-style: italic;
+  letter-spacing: 0.7px;
+  font-weight: 500;
+}
+
+.dark-academia .task-title {
+  font-weight: 400;
+  font-size: 1.05em;
+} 

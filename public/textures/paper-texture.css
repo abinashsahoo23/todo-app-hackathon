@@ -1,0 +1,23 @@
+/* Paper texture for Dark Academia theme */
+.dark-academia {
+  background-image: url('../textures/paper-texture.jpg');
+  background-color: #f5ebe0;
+  background-blend-mode: overlay;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+.dark-academia.theme-transition {
+  transition: background-color 0.5s ease;
+}
+
+/* Add subtle texture to cards in Dark Academia theme */
+.dark-academia .task-card,
+.dark-academia .widget,
+.dark-academia .modal-content {
+  background-image: url('../textures/paper-texture-light.jpg');
+  background-size: cover;
+  background-blend-mode: overlay;
+  border: 1px solid rgba(156, 102, 68, 0.3);
+} 
