@@ -1,0 +1,946 @@
+# TO-DO APP THEME SYSTEM - COMPLETE CODE DOCUMENTATION
+
+This file contains all the code needed to implement the customizable theme system with font styling for the To-Do App.
+
+=====================================================================
+TABLE OF CONTENTS
+=====================================================================
+1. Theme Context (ThemeContext.tsx)
+2. Theme Font Applier Component (ThemeFontApplier.tsx)
+3. App Component with Theme Integration (App.tsx)
+4. Theme Transition CSS (theme-transition.css)
+5. HTML Head Font Configuration (index.html)
+6. Theme Variables in CSS (index.css)
+7. Implementation Guide & Usage Examples
+8. Toast Component Implementation (Toast.tsx)
+9. Toast Context Implementation (ToastContext.tsx)
+=====================================================================
+
+=====================================================================
+1. THEME CONTEXT (ThemeContext.tsx)
+=====================================================================
+
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { Theme, ThemeColors } from '../types';
+
+interface ThemeContextType {
+  theme: Theme;
+  themeColors: ThemeColors;
+  setTheme: (theme: Theme) => void;
+  nextTheme: () => void;
+  isDarkMode: boolean;
+}
+
+const themeColorMap: Record<Theme, ThemeColors> = {
+  'neo-tokyo': {
+    primary: '#00f0ff',
+    secondary: '#ff00aa',
+    background: '#090916',
+    backgroundSecondary: '#0f0f24',
+    text: '#ffffff',
+    textSecondary: 'rgba(255, 255, 255, 0.8)',
+    accent: '#ffcc00'
+  },
+  'pastel-vibes': {
+    primary: '#b5a9ff',
+    secondary: '#ffafcc',
+    background: '#fffcf7',
+    backgroundSecondary: '#f8edeb',
+    text: '#6d6875',
+    textSecondary: '#8d8393',
+    accent: '#fec89a'
+  },
+  'dark-academia': {
+    primary: '#9c6644',
+    secondary: '#7d5a50',
+    background: '#f5ebe0',
+    backgroundSecondary: '#e3d5ca',
+    text: '#3d2b24',
+    textSecondary: '#57453c',
+    accent: '#b08968'
+  }
+};
+
+// Define array of dark themes for special text handling
+const darkThemes = ['neo-tokyo'];
+
+// Theme order for cycling through with nextTheme
+const themeOrder: Theme[] = [
+  'neo-tokyo',
+  'pastel-vibes',
+  'dark-academia'
+];
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme && Object.keys(themeColorMap).includes(savedTheme)) {
+      return savedTheme as Theme;
+    }
+    
+    // Set default theme to pastel-vibes
+    return 'pastel-vibes';
+  });
+  
+  const [previousTheme, setPreviousTheme] = useState<Theme>(theme);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Smooth theme transition
+  const setTheme = useCallback((newTheme: Theme) => {
+    if (newTheme === theme) return;
+    
+    setIsTransitioning(true);
+    setPreviousTheme(theme);
+    
+    // Add brief delay for animation
+    setTimeout(() => {
+      setThemeState(newTheme);
+      setIsTransitioning(false);
+    }, 300);
+  }, [theme]);
+  
+  // Get next theme in cycle
+  const nextTheme = useCallback(() => {
+    const currentIndex = themeOrder.indexOf(theme);
+    const nextIndex = (currentIndex + 1) % themeOrder.length;
+    setTheme(themeOrder[nextIndex]);
+  }, [theme, setTheme]);
+  
+  // Determine if current theme is dark mode
+  const isDarkMode = darkThemes.includes(theme);
+
+  useEffect(() => {
+    // Apply theme class to the HTML element (root)
+    const htmlElement = document.documentElement;
+    
+    // Remove all theme classes first
+    htmlElement.classList.remove(...Object.keys(themeColorMap));
+    htmlElement.classList.add(theme);
+    localStorage.setItem('theme', theme);
+    
+    // Handle dark mode class for Tailwind
+    if (isDarkMode) {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+    
+    // Apply transition class for smooth theme transitions
+    if (isTransitioning) {
+      htmlElement.classList.add('theme-transition');
+    } else {
+      setTimeout(() => {
+        htmlElement.classList.remove('theme-transition');
+      }, 300);
+    }
+    
+    // Handle dark theme text
+    if (darkThemes.includes(theme)) {
+      htmlElement.classList.add('dark-theme-text');
+    } else {
+      htmlElement.classList.remove('dark-theme-text');
+    }
+
+    // Add CSS variables for theme colors
+    const colors = themeColorMap[theme];
+    Object.entries(colors).forEach(([key, value]) => {
+      htmlElement.style.setProperty(`--color-${key}`, value);
+      
+      // Also add RGB values for opacity utilities
+      if (key === 'primary' || key === 'secondary' || key === 'accent') {
+        const hex = value.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        htmlElement.style.setProperty(`--${key}-rgb`, `${r}, ${g}, ${b}`);
+      }
+    });
+  }, [theme, isDarkMode, isTransitioning]);
+
+  return (
+    <ThemeContext.Provider 
+      value={{ 
+        theme, 
+        themeColors: themeColorMap[theme], 
+        setTheme, 
+        nextTheme,
+        isDarkMode
+      }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+
+=====================================================================
+2. THEME FONT APPLIER COMPONENT (ThemeFontApplier.tsx)
+=====================================================================
+
+import React, { useEffect } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
+
+/**
+ * Component that forces theme fonts by injecting a style tag directly into the document head
+ */
+const ThemeFontApplier: React.FC = () => {
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    // Remove any existing style tag we previously added
+    const existingStyle = document.getElementById('theme-font-styles');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+
+    // Create a new style element
+    const styleElement = document.createElement('style');
+    styleElement.id = 'theme-font-styles';
+    
+    // Define font styles based on current theme
+    let fontStyles = '';
+    
+    if (theme === 'neo-tokyo') {
+      fontStyles = `
+        body { font-family: 'Saira Stencil One', sans-serif !important; }
+        * { font-family: 'Saira Stencil One', sans-serif !important; }
+        h1, h2, h3, h4, h5, h6 { 
+          font-family: 'Saira Stencil One', sans-serif !important;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-weight: 700;
+        }
+      `;
+    } else if (theme === 'pastel-vibes') {
+      fontStyles = `
+        body { font-family: 'Comic Neue', cursive !important; }
+        * { font-family: 'Comic Neue', cursive !important; }
+        h1, h2, h3, h4, h5, h6 { 
+          font-family: 'Comic Neue', cursive !important;
+          letter-spacing: 0.5px;
+          font-weight: 700;
+        }
+      `;
+    } else if (theme === 'dark-academia') {
+      fontStyles = `
+        body { font-family: 'Cormorant Garamond', serif !important; }
+        * { font-family: 'Cormorant Garamond', serif !important; }
+        h1, h2, h3, h4, h5, h6 { 
+          font-family: 'Cormorant Garamond', serif !important;
+          font-style: italic;
+          letter-spacing: 0.7px;
+          font-weight: 500;
+        }
+      `;
+    }
+
+    styleElement.textContent = fontStyles;
+    
+    // Add the style tag to the document head
+    document.head.appendChild(styleElement);
+    
+    // Cleanup on unmount
+    return () => {
+      if (styleElement.parentNode) {
+        styleElement.parentNode.removeChild(styleElement);
+      }
+    };
+  }, [theme]);
+
+  return null; // This component doesn't render anything
+};
+
+export default ThemeFontApplier;
+
+=====================================================================
+3. APP COMPONENT WITH THEME INTEGRATION (App.tsx)
+=====================================================================
+
+import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
+import TabNavigation from './components/TabNavigation';
+import TasksPage from './pages/TasksPage';
+import StatsPage from './pages/StatsPage';
+import FocusMode from './components/FocusMode';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { TaskProvider } from './contexts/TaskContext';
+import { TabProvider, useTabs } from './contexts/TabContext';
+import { ToastContainer } from './utils/toast';
+import { useTheme } from './contexts/ThemeContext';
+import ThemeFontApplier from './components/ThemeFontApplier';
+
+/**
+ * Main App content component that uses the contexts
+ */
+const AppContent: React.FC = () => {
+  const { activeTab } = useTabs();
+  const { theme } = useTheme();
+  const [isFocusModeOpen, setFocusModeOpen] = useState(false);
+  
+  // Apply theme class directly to body
+  useEffect(() => {
+    document.body.className = '';
+    document.body.classList.add(theme, 'theme-transition');
+    
+    return () => {
+      document.body.classList.remove(theme, 'theme-transition');
+    };
+  }, [theme]);
+  
+  const openFocusMode = () => {
+    setFocusModeOpen(true);
+  };
+  
+  const closeFocusMode = () => {
+    setFocusModeOpen(false);
+  };
+
+  return (
+    <>
+      <ThemeFontApplier />
+      <div className={`min-h-screen pb-10 transition-colors duration-300 ${theme}`}>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+          <Header />
+          <main className="mt-6 sm:mt-8">
+            <TabNavigation />
+            {activeTab === 'tasks' && <TasksPage />}
+            {activeTab === 'stats' && <StatsPage />}
+          </main>
+          
+          {/* Floating Focus Mode Button */}
+          <button
+            onClick={openFocusMode}
+            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg flex items-center justify-center z-10 transition-all duration-300 transform hover:scale-105"
+            aria-label="Enter focus mode"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <span className="ml-2 font-medium">Focus Mode</span>
+          </button>
+          
+          {/* Focus Mode Component */}
+          <FocusMode isOpen={isFocusModeOpen} onClose={closeFocusMode} />
+          
+          {/* Toast notifications */}
+          <ToastContainer />
+        </div>
+      </div>
+    </>
+  );
+};
+
+/**
+ * Main App component orchestrating the To-Do List application
+ * Provides context providers for theme, tasks and tabs
+ */
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <TaskProvider>
+        <TabProvider>
+          <AppContent />
+        </TabProvider>
+      </TaskProvider>
+    </ThemeProvider>
+  );
+};
+
+export default App;
+
+=====================================================================
+4. THEME TRANSITION CSS (theme-transition.css)
+=====================================================================
+
+/* Theme Transition Effects */
+.theme-transition {
+  transition: background-color 0.5s ease, 
+              color 0.5s ease, 
+              border-color 0.5s ease, 
+              box-shadow 0.5s ease, 
+              background-image 0.5s ease;
+}
+
+.theme-transition * {
+  transition: background-color 0.5s ease, 
+              color 0.5s ease, 
+              border-color 0.5s ease, 
+              box-shadow 0.5s ease, 
+              font-family 0.5s ease, 
+              letter-spacing 0.5s ease,
+              text-shadow 0.5s ease;
+}
+
+/* Special transitions for specific elements */
+.theme-transition .task-item,
+.theme-transition .task-card {
+  transition: transform 0.3s ease, 
+              box-shadow 0.5s ease, 
+              background-color 0.5s ease,
+              border-color 0.5s ease;
+}
+
+.theme-transition button,
+.theme-transition .button {
+  transition: background-color 0.5s ease,
+              color 0.5s ease,
+              border-color 0.5s ease,
+              box-shadow 0.5s ease,
+              transform 0.3s ease;
+}
+
+.theme-transition input,
+.theme-transition textarea,
+.theme-transition select {
+  transition: background-color 0.5s ease,
+              color 0.5s ease,
+              border-color 0.5s ease,
+              box-shadow 0.5s ease;
+}
+
+/* Fade effect for theme changes */
+.theme-fade-element {
+  animation: themeFade 0.5s ease-in-out;
+}
+
+@keyframes themeFade {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure smooth font transitions */
+h1, h2, h3, h4, h5, h6, p, span, div {
+  transition: font-family 0.5s ease, 
+              letter-spacing 0.5s ease, 
+              font-weight 0.5s ease,
+              color 0.5s ease;
+}
+
+/* Theme-specific font styling - Extremely aggressive approach */
+/* Neo Tokyo theme font styling */
+html.neo-tokyo,
+body.neo-tokyo,
+.neo-tokyo,
+.neo-tokyo body,
+.neo-tokyo #root,
+.neo-tokyo [class*="container"],
+.neo-tokyo [class*="wrapper"],
+.neo-tokyo div,
+.neo-tokyo p,
+.neo-tokyo span,
+.neo-tokyo a,
+.neo-tokyo button,
+.neo-tokyo input,
+.neo-tokyo select,
+.neo-tokyo textarea {
+  font-family: 'Saira Stencil One', sans-serif !important;
+  letter-spacing: 1px;
+}
+
+.neo-tokyo h1, 
+.neo-tokyo h2, 
+.neo-tokyo h3, 
+.neo-tokyo h4 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.neo-tokyo .task-title,
+.neo-tokyo button,
+.neo-tokyo .button {
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Pastel Vibes theme font styling */
+html.pastel-vibes,
+body.pastel-vibes,
+.pastel-vibes,
+.pastel-vibes body,
+.pastel-vibes #root,
+.pastel-vibes [class*="container"],
+.pastel-vibes [class*="wrapper"],
+.pastel-vibes div,
+.pastel-vibes p,
+.pastel-vibes span,
+.pastel-vibes a,
+.pastel-vibes button,
+.pastel-vibes input,
+.pastel-vibes select,
+.pastel-vibes textarea {
+  font-family: 'Comic Neue', cursive !important;
+  letter-spacing: 0.3px;
+}
+
+.pastel-vibes h1, 
+.pastel-vibes h2, 
+.pastel-vibes h3, 
+.pastel-vibes h4 {
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.pastel-vibes .task-title {
+  font-weight: 500;
+}
+
+/* Dark Academia theme font styling */
+html.dark-academia,
+body.dark-academia,
+.dark-academia,
+.dark-academia body,
+.dark-academia #root,
+.dark-academia [class*="container"],
+.dark-academia [class*="wrapper"],
+.dark-academia div,
+.dark-academia p,
+.dark-academia span,
+.dark-academia a,
+.dark-academia button,
+.dark-academia input,
+.dark-academia select,
+.dark-academia textarea {
+  font-family: 'Cormorant Garamond', serif !important;
+  letter-spacing: 0.5px;
+}
+
+.dark-academia h1, 
+.dark-academia h2, 
+.dark-academia h3, 
+.dark-academia h4 {
+  font-style: italic;
+  letter-spacing: 0.7px;
+  font-weight: 500;
+}
+
+.dark-academia .task-title {
+  font-weight: 400;
+  font-size: 1.05em;
+}
+
+=====================================================================
+5. HTML HEAD FONT CONFIGURATION (index.html)
+=====================================================================
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Modern To-Do List Web App built with React and Tailwind CSS" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Preload theme fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&display=swap" as="style" />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap" as="style" />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" as="style" />
+    
+    <!-- Theme fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" />
+    
+    <!-- Direct theme font styling -->
+    <style>
+      /* Force theme font styling */
+      body.neo-tokyo * {
+        font-family: 'Saira Stencil One', sans-serif !important;
+      }
+      
+      body.pastel-vibes * {
+        font-family: 'Comic Neue', cursive !important;
+      }
+      
+      body.dark-academia * {
+        font-family: 'Cormorant Garamond', serif !important;
+      }
+      
+      /* Override common elements that might have built-in fonts */
+      body.neo-tokyo button, body.neo-tokyo input, body.neo-tokyo select, body.neo-tokyo textarea,
+      body.pastel-vibes button, body.pastel-vibes input, body.pastel-vibes select, body.pastel-vibes textarea,
+      body.dark-academia button, body.dark-academia input, body.dark-academia select, body.dark-academia textarea {
+        font-family: inherit !important;
+      }
+    </style>
+    
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>My To-Do List</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+
+=====================================================================
+6. THEME VARIABLES IN CSS (partial index.css)
+=====================================================================
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import './styles/theme-transition.css';
+
+/* Base theme variables */
+:root {
+  --transition-fast: 0.15s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+}
+
+/* Neo Tokyo theme - Futuristic, high-contrast, techy */
+.neo-tokyo {
+  /* Typography */
+  --font-primary: 'Saira Stencil One', sans-serif;
+  --letter-spacing: 1px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Core colors */
+  --color-primary: #00f0ff;
+  --color-primary-rgb: 0, 240, 255;
+  --color-secondary: #ff00aa;
+  --color-secondary-rgb: 255, 0, 170;
+  /* ... other theme variables */
+}
+
+/* Pastel Vibes theme - Soft, cute, cozy aesthetic */
+.pastel-vibes {
+  /* Typography */
+  --font-primary: 'Comic Neue', cursive;
+  --letter-spacing: 0.3px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Core colors */
+  --color-primary: #b5a9ff;
+  --color-primary-rgb: 181, 169, 255;
+  --color-secondary: #ffafcc;
+  /* ... other theme variables */
+}
+
+/* Dark Academia theme - Vintage, intellectual, moody */
+.dark-academia {
+  /* Typography */
+  --font-primary: 'Cormorant Garamond', serif;
+  --letter-spacing: 0.5px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+
+  /* Core colors */
+  --color-primary: #9c6644;
+  --color-primary-rgb: 156, 102, 68;
+  /* ... other theme variables */
+}
+
+=====================================================================
+7. IMPLEMENTATION GUIDE & USAGE EXAMPLES
+=====================================================================
+
+THEME SYSTEM OVERVIEW:
+
+This theming system provides three distinct themes with different font styles:
+
+1. Neo Tokyo Theme:
+   - Font: "Saira Stencil One" (sans-serif)
+   - Style: Bold, stencil, techy-military
+   - Vibe: Urban, dystopian, futuristic with Blade Runner energy
+   - Characteristics: Uppercase text, larger letter spacing, high contrast
+
+2. Pastel Vibes Theme (Default):
+   - Font: "Comic Neue" (cursive)
+   - Style: Soft, rounded, playful
+   - Vibe: Cute, cozy, friendly
+   - Characteristics: Medium letter spacing, rounded feel
+
+3. Dark Academia Theme:
+   - Font: "Cormorant Garamond" (serif)
+   - Style: Elegant, vintage, intellectual
+   - Vibe: Classical, sophisticated, moody
+   - Characteristics: Italicized headings, serif details, old-world charm
+
+HOW THE THEME SYSTEM WORKS:
+
+1. Multi-Layer Font Application:
+   - CSS Variables: Theme-specific CSS variables define font families
+   - Aggressive CSS Selectors: High-specificity selectors target all elements within a theme
+   - Dynamic Style Injection: ThemeFontApplier injects font styles directly into the document head
+   - Direct HTML Styles: Additional styles in HTML head for immediate application
+   - Preloaded Fonts: Fonts are preloaded for quick availability during theme switches
+
+2. Theme Switching Process:
+   - When a theme is selected:
+     * Theme class is applied to HTML and body elements
+     * CSS variables are updated with theme values
+     * ThemeFontApplier injects font-specific styling
+     * Transition classes ensure smooth visual changes
+     * Theme selection is saved to localStorage
+
+3. Default Theme Configuration:
+   - Default theme is set to "pastel-vibes" for new users
+   - The app remembers previous theme selection with localStorage
+
+USAGE EXAMPLES:
+
+1. Basic Theme Usage:
+   ```tsx
+   const MyComponent = () => {
+     const { theme } = useTheme();
+     
+     return (
+       <div className={`my-component ${theme}`}>
+         <h1>This text will use the theme font</h1>
+       </div>
+     );
+   };
+   ```
+
+2. Theme Switching:
+   ```tsx
+   const ThemeSwitcher = () => {
+     const { setTheme } = useTheme();
+     
+     return (
+       <div className="theme-switcher">
+         <button onClick={() => setTheme('neo-tokyo')}>Neo Tokyo</button>
+         <button onClick={() => setTheme('pastel-vibes')}>Pastel Vibes</button>
+         <button onClick={() => setTheme('dark-academia')}>Dark Academia</button>
+       </div>
+     );
+   };
+   ```
+
+3. Theme Cycling Button:
+   ```tsx
+   const ThemeCycleButton = () => {
+     const { nextTheme } = useTheme();
+     
+     return (
+       <button onClick={nextTheme} className="theme-cycle-button">
+         Next Theme
+       </button>
+     );
+   };
+   ```
+
+4. Theme-Aware Component:
+   ```tsx
+   const ThemedCard = ({ title, content }) => {
+     const { theme, themeColors } = useTheme();
+     
+     return (
+       <div 
+         className={`card ${theme}`}
+         style={{ 
+           backgroundColor: themeColors.backgroundSecondary,
+           color: themeColors.text
+         }}
+       >
+         <h2>{title}</h2>
+         <p>{content}</p>
+       </div>
+     );
+   };
+   ```
+
+TROUBLESHOOTING TIPS:
+
+1. If fonts aren't changing correctly:
+   - Check if the theme class is correctly applied to both HTML and body elements
+   - Verify that Google Fonts are properly loaded (network tab in dev tools)
+   - Use browser dev tools to inspect element styles and check font-family inheritance
+
+2. If theme transitions are jerky:
+   - Ensure the theme-transition class is applied before changing themes
+   - Adjust transition timing in the theme-transition.css file
+
+3. If colors don't match the theme:
+   - Verify CSS variables are being correctly set in the ThemeContext useEffect
+   - Check for any hardcoded color values that might override theme colors
+
+=====================================================================
+8. TOAST COMPONENT IMPLEMENTATION (Toast.tsx)
+=====================================================================
+
+import React, { useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { toastVariants } from '../../utils/animations';
+import { XIcon, CheckCircleIcon, ExclamationIcon, InformationCircleIcon } from '@heroicons/react/outline';
+
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+
+export interface ToastProps {
+  id: string;
+  message: string;
+  type: ToastType;
+  duration?: number;
+  onClose: (id: string) => void;
+}
+
+const Toast: React.FC<ToastProps> = ({ 
+  id, 
+  message, 
+  type = 'info', 
+  duration = 3000, 
+  onClose 
+}) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose(id);
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [id, duration, onClose]);
+
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return <CheckCircleIcon className="w-5 h-5 text-green-400" />;
+      case 'error':
+        return <ExclamationIcon className="w-5 h-5 text-red-400" />;
+      case 'warning':
+        return <ExclamationIcon className="w-5 h-5 text-yellow-400" />;
+      case 'info':
+      default:
+        return <InformationCircleIcon className="w-5 h-5 text-blue-400" />;
+    }
+  };
+
+  const getBackgroundClass = () => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400';
+      case 'error':
+        return 'bg-red-50 dark:bg-red-900/30 border-l-4 border-red-400';
+      case 'warning':
+        return 'bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400';
+      case 'info':
+      default:
+        return 'bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400';
+    }
+  };
+
+  return (
+    <motion.div
+      key={id}
+      className={`rounded-md shadow-md p-4 max-w-md w-full flex items-start gap-3 ${getBackgroundClass()} theme-transition`}
+      variants={toastVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      role="alert"
+      aria-live="assertive"
+    >
+      <div className="flex-shrink-0 pt-0.5">
+        {getIcon()}
+      </div>
+      
+      <div className="flex-1 ml-1">
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {message}
+        </p>
+      </div>
+      
+      <button
+        onClick={() => onClose(id)}
+        className="flex-shrink-0 ml-1 p-1 rounded hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        aria-label="Close notification"
+      >
+        <XIcon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+      </button>
+    </motion.div>
+  );
+};
+
+export default Toast;
+
+=====================================================================
+9. TOAST CONTEXT IMPLEMENTATION (ToastContext.tsx)
+=====================================================================
+
+// Define custom type declaration for uuid in src/types/uuid.d.ts
+// declare module 'uuid' {
+//   export function v4(): string;
+//   export function v1(): string;
+//   export function v3(): string;
+//   export function v5(): string;
+//   export function validate(uuid: string): boolean;
+//   export function version(uuid: string): number;
+//   export function parse(uuid: string): Buffer;
+// }
+
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import Toast, { ToastProps, ToastType } from '../components/ui/Toast';
+import { v4 as uuidv4 } from 'uuid';
+
+interface ToastContextProps {
+  showToast: (message: string, type?: ToastType, duration?: number) => void;
+  hideToast: (id: string) => void;
+}
+
+interface Toast extends Omit<ToastProps, 'onClose'> {}
+
+const ToastContext = createContext<ToastContextProps | undefined>(undefined);
+
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const showToast = useCallback((message: string, type: ToastType = 'info', duration = 3000) => {
+    const id = uuidv4();
+    setToasts(prev => [...prev, { id, message, type, duration }]);
+  }, []);
+
+  const hideToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+
+  return (
+    <ToastContext.Provider value={{ showToast, hideToast }}>
+      {children}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" aria-live="polite">
+        <AnimatePresence>
+          {toasts.map(toast => (
+            <Toast
+              key={toast.id}
+              id={toast.id}
+              message={toast.message}
+              type={toast.type}
+              duration={toast.duration}
+              onClose={hideToast}
+            />
+          ))}
+        </AnimatePresence>
+      </div>
+    </ToastContext.Provider>
+  );
+};
+
+export const useToast = (): ToastContextProps => {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
+  return context;
+}; 
